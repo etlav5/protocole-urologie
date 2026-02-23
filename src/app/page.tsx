@@ -36,7 +36,8 @@ const protocols: Protocol[] = [
     designShort: "Window-of-opportunity pré-prostatectomie",
     designFull:
       "Étude de phase I randomisée évaluant un traitement préopératoire avant prostatectomie radicale.",
-    population: "Cancer prostate localisé à risque intermédiaire et à haut risque.",
+    population:
+      "Cancer prostate localisé à risque intermédiaire et à haut risque.",
     inclusion: ["Cancer localisé", "Candidat chirurgie"],
     schemaSrc: ["/schemas/asertain_schema.png"],
   },
@@ -68,10 +69,7 @@ const protocols: Protocol[] = [
     designFull: "Phase III comparant TAR-200 ± IO vs BCG.",
     population: "NMIBC à haut risque.",
     inclusion: ["HR-NMIBC"],
-    schemaSrc: [
-      "/schemas/sunrise3_schema1.png",
-      "/schemas/sunrise3_schema2.png",
-    ],
+    schemaSrc: ["/schemas/sunrise3_schema1.png", "/schemas/sunrise3_schema2.png"],
   },
 
   {
@@ -118,38 +116,46 @@ const protocols: Protocol[] = [
   },
 ];
 
-function Modal({ open, onClose, children }: any) {
+function Modal({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose}/>
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 relative">
-        <button onClick={onClose} className="absolute right-4 top-3">✕</button>
-        <div className="max-h-[75vh] overflow-y-auto pr-2">
-          {children}
-        </div>
+        <button onClick={onClose} className="absolute right-4 top-3">
+          ✕
+        </button>
+        <div className="max-h-[75vh] overflow-y-auto pr-2">{children}</div>
       </div>
     </div>
   );
 }
 
 export default function Page() {
-  const [activeCancer,setActiveCancer]=useState<Cancer>("Prostate");
-  const [activeStage,setActiveStage]=useState("Localisé");
-  const [selected,setSelected]=useState<any>(null);
-  const [zoom,setZoom]=useState<string|null>(null);
+  const [activeCancer, setActiveCancer] = useState<Cancer>("Prostate");
+  const [activeStage, setActiveStage] = useState("Localisé");
+  const [selected, setSelected] = useState<Protocol | null>(null);
+  const [zoom, setZoom] = useState<string | null>(null);
 
-  const stages=timelineByCancer[activeCancer];
+  const stages = timelineByCancer[activeCancer];
 
-  const filtered=useMemo(()=>{
+  const filtered = useMemo(() => {
     return protocols.filter(
-      p=>p.cancer===activeCancer && p.stage===activeStage
+      (p) => p.cancer === activeCancer && p.stage === activeStage
     );
-  },[activeCancer,activeStage]);
+  }, [activeCancer, activeStage]);
 
-  return(
+  return (
     <div className="p-8 bg-gray-50 min-h-screen">
-
       {/* TITRE */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">
@@ -162,12 +168,15 @@ export default function Page() {
 
       {/* onglets */}
       <div className="flex gap-3 mb-6">
-        {(["Prostate","Vessie","Rein"] as Cancer[]).map(c=>(
+        {(["Prostate", "Vessie", "Rein"] as Cancer[]).map((c) => (
           <button
             key={c}
-            onClick={()=>{setActiveCancer(c);setActiveStage(timelineByCancer[c][0])}}
+            onClick={() => {
+              setActiveCancer(c);
+              setActiveStage(timelineByCancer[c][0]);
+            }}
             className={`px-4 py-2 rounded-xl ${
-              c===activeCancer?"bg-black text-white":"bg-white shadow"
+              c === activeCancer ? "bg-black text-white" : "bg-white shadow"
             }`}
           >
             {c}
@@ -178,16 +187,17 @@ export default function Page() {
       {/* timeline */}
       <div className="mb-10">
         <div className="relative flex justify-between items-center">
-          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300"/>
-          {stages.map((s)=>(
+          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300" />
+          {stages.map((s) => (
             <div key={s} className="flex flex-col items-center z-10">
               <button
-                onClick={()=>setActiveStage(s)}
+                onClick={() => setActiveStage(s)}
                 className={`w-6 h-6 rounded-full border-4 ${
-                  s===activeStage
+                  s === activeStage
                     ? "bg-black border-black"
                     : "bg-white border-gray-400"
                 }`}
+                aria-label={`Choisir stade ${s}`}
               />
               <div className="text-xs mt-2">{s}</div>
             </div>
@@ -197,10 +207,10 @@ export default function Page() {
 
       {/* cartes */}
       <div className="grid md:grid-cols-2 gap-6">
-        {filtered.map(p=>(
+        {filtered.map((p) => (
           <button
             key={p.id}
-            onClick={()=>setSelected(p)}
+            onClick={() => setSelected(p)}
             className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border"
           >
             <div className="flex justify-between mb-2">
@@ -212,9 +222,7 @@ export default function Page() {
               )}
             </div>
 
-            <div className="text-sm text-gray-700 mb-2">
-              {p.designShort}
-            </div>
+            <div className="text-sm text-gray-700 mb-2">{p.designShort}</div>
 
             <div className="flex gap-2 flex-wrap">
               {p.phase && (
@@ -234,17 +242,18 @@ export default function Page() {
       </div>
 
       {/* modal */}
-      <Modal open={!!selected} onClose={()=>setSelected(null)}>
+      <Modal open={!!selected} onClose={() => setSelected(null)}>
         {selected && (
           <div className="space-y-6">
             <h2 className="text-xl font-bold">{selected.title}</h2>
 
-            {selected.schemaSrc?.map((src:string)=>(
+            {selected.schemaSrc?.map((src: string) => (
               <img
                 key={src}
                 src={src}
+                alt={`Schéma - ${selected.title}`}
                 className="rounded-xl border cursor-zoom-in"
-                onClick={()=>setZoom(src)}
+                onClick={() => setZoom(src)}
               />
             ))}
 
@@ -261,7 +270,7 @@ export default function Page() {
             <div>
               <b>Critères d’inclusion</b>
               <ul className="list-disc pl-6">
-                {selected.inclusion.map((i:string)=>(
+                {selected.inclusion.map((i: string) => (
                   <li key={i}>{i}</li>
                 ))}
               </ul>
@@ -270,10 +279,9 @@ export default function Page() {
         )}
       </Modal>
 
-      <Modal open={!!zoom} onClose={()=>setZoom(null)}>
-        {zoom && <img src={zoom} className="rounded-xl"/>}
+      <Modal open={!!zoom} onClose={() => setZoom(null)}>
+        {zoom && <img src={zoom} alt="Schéma (zoom)" className="rounded-xl" />}
       </Modal>
-
     </div>
-  )
+  );
 }

@@ -41,7 +41,6 @@ const protocols: Protocol[] = [
     inclusion: ["Cancer localisé", "Candidat chirurgie"],
     schemaSrc: ["/schemas/asertain_schema.png"],
   },
-
   {
     id: "psmadc",
     cancer: "Prostate",
@@ -56,7 +55,6 @@ const protocols: Protocol[] = [
     inclusion: ["≤5 lésions"],
     schemaSrc: ["/schemas/psmadc_schema.png"],
   },
-
   {
     id: "sunrise3",
     cancer: "Vessie",
@@ -71,7 +69,6 @@ const protocols: Protocol[] = [
     inclusion: ["HR-NMIBC"],
     schemaSrc: ["/schemas/sunrise3_schema1.png", "/schemas/sunrise3_schema2.png"],
   },
-
   {
     id: "volga",
     cancer: "Vessie",
@@ -86,7 +83,6 @@ const protocols: Protocol[] = [
     inclusion: ["Candidat cystectomie"],
     schemaSrc: ["/schemas/volga_schema.png"],
   },
-
   {
     id: "v940004",
     cancer: "Rein",
@@ -101,7 +97,6 @@ const protocols: Protocol[] = [
     inclusion: ["RCC"],
     schemaSrc: ["/schemas/v940004_schema.png"],
   },
-
   {
     id: "socratic",
     cancer: "Rein",
@@ -129,12 +124,18 @@ function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 relative">
-        <button onClick={onClose} className="absolute right-4 top-3">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-3xl p-6 relative border border-gray-200 dark:border-gray-700">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-3 text-gray-700 dark:text-gray-200"
+          aria-label="Fermer"
+        >
           ✕
         </button>
-        <div className="max-h-[75vh] overflow-y-auto pr-2">{children}</div>
+        <div className="max-h-[75vh] overflow-y-auto pr-2 text-gray-900 dark:text-gray-100">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -155,13 +156,11 @@ export default function Page() {
   }, [activeCancer, activeStage]);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="p-8 min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       {/* TITRE */}
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Protocoles de recherche en urologie
-        </h1>
-        <p className="text-gray-500 mt-2">
+        <h1 className="text-3xl font-bold">Protocoles de recherche en urologie</h1>
+        <p className="mt-2 text-gray-800 dark:text-gray-200">
           Outil interne de visualisation des études cliniques
         </p>
       </div>
@@ -175,8 +174,10 @@ export default function Page() {
               setActiveCancer(c);
               setActiveStage(timelineByCancer[c][0]);
             }}
-            className={`px-4 py-2 rounded-xl ${
-              c === activeCancer ? "bg-black text-white" : "bg-white shadow"
+            className={`px-4 py-2 rounded-xl border ${
+              c === activeCancer
+                ? "bg-black text-white border-black"
+                : "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
             }`}
           >
             {c}
@@ -187,7 +188,7 @@ export default function Page() {
       {/* timeline */}
       <div className="mb-10">
         <div className="relative flex justify-between items-center">
-          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300" />
+          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300 dark:bg-gray-700" />
           {stages.map((s) => (
             <div key={s} className="flex flex-col items-center z-10">
               <button
@@ -195,11 +196,13 @@ export default function Page() {
                 className={`w-6 h-6 rounded-full border-4 ${
                   s === activeStage
                     ? "bg-black border-black"
-                    : "bg-white border-gray-400"
+                    : "bg-white dark:bg-gray-950 border-gray-500 dark:border-gray-400"
                 }`}
                 aria-label={`Choisir stade ${s}`}
               />
-              <div className="text-xs mt-2">{s}</div>
+              <div className="text-xs mt-2 text-gray-900 dark:text-gray-100">
+                {s}
+              </div>
             </div>
           ))}
         </div>
@@ -211,28 +214,32 @@ export default function Page() {
           <button
             key={p.id}
             onClick={() => setSelected(p)}
-            className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border border-gray-200 dark:border-gray-700"
           >
             <div className="flex justify-between mb-2">
-              <div className="text-lg font-semibold">{p.title}</div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {p.title}
+              </div>
               {p.randomized && (
-                <span className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">
+                <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-100 text-xs px-2 py-1 rounded">
                   Randomisée
                 </span>
               )}
             </div>
 
-            <div className="text-sm text-gray-700 mb-2">{p.designShort}</div>
+            <div className="text-sm text-gray-900 dark:text-gray-100 mb-2">
+              {p.designShort}
+            </div>
 
             <div className="flex gap-2 flex-wrap">
               {p.phase && (
-                <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+                <span className="bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100 text-xs px-2 py-1 rounded">
                   {p.phase}
                 </span>
               )}
 
               {p.blinding && (
-                <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded">
+                <span className="bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-100 text-xs px-2 py-1 rounded">
                   {p.blinding}
                 </span>
               )}
@@ -252,24 +259,24 @@ export default function Page() {
                 key={src}
                 src={src}
                 alt={`Schéma - ${selected.title}`}
-                className="rounded-xl border cursor-zoom-in"
+                className="rounded-xl border border-gray-200 dark:border-gray-700 cursor-zoom-in"
                 onClick={() => setZoom(src)}
               />
             ))}
 
             <div>
               <b>Devis</b>
-              <p>{selected.designFull}</p>
+              <p className="text-gray-900 dark:text-gray-100">{selected.designFull}</p>
             </div>
 
             <div>
               <b>Population</b>
-              <p>{selected.population}</p>
+              <p className="text-gray-900 dark:text-gray-100">{selected.population}</p>
             </div>
 
             <div>
               <b>Critères d’inclusion</b>
-              <ul className="list-disc pl-6">
+              <ul className="list-disc pl-6 text-gray-900 dark:text-gray-100">
                 {selected.inclusion.map((i: string) => (
                   <li key={i}>{i}</li>
                 ))}
@@ -285,3 +292,4 @@ export default function Page() {
     </div>
   );
 }
+

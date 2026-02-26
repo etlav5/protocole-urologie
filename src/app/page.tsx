@@ -59,13 +59,15 @@ export default function Page() {
     <div className="p-8 min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       {/* TITRE */}
       <div className="mb-10">
-        <h1 className="text-3xl font-bold">Protocoles de recherche en urologie</h1>
+        <h1 className="text-3xl font-bold">
+          Protocoles de recherche en urologie
+        </h1>
         <p className="mt-2 text-gray-800 dark:text-gray-200">
           Outil interne de visualisation des études cliniques
         </p>
       </div>
 
-      {/* onglets */}
+      {/* ONGLETS */}
       <div className="flex gap-3 mb-6">
         {(["Prostate", "Vessie", "Rein"] as Cancer[]).map((c) => (
           <button
@@ -85,7 +87,7 @@ export default function Page() {
         ))}
       </div>
 
-      {/* timeline */}
+      {/* TIMELINE */}
       <div className="mb-10">
         <div className="relative flex justify-between items-center">
           <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300 dark:bg-gray-700" />
@@ -100,20 +102,31 @@ export default function Page() {
                 }`}
                 aria-label={`Choisir stade ${s}`}
               />
-              <div className="text-xs mt-2 text-gray-900 dark:text-gray-100">{s}</div>
+              <div className="text-xs mt-2 text-gray-900 dark:text-gray-100">
+                {s}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* cartes */}
+      {/* CARTES */}
       <div className="grid md:grid-cols-2 gap-6">
         {filtered.map((p) => (
           <button
             key={p.id}
             onClick={() => setSelected(p)}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border border-gray-200 dark:border-gray-700"
+            className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border border-gray-200 dark:border-gray-700"
           >
+            {/* WATERMARK SUSPENDU */}
+            {(p as any).suspended && (
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="text-4xl md:text-5xl font-extrabold uppercase tracking-widest text-red-700/35 dark:text-red-300/25 rotate-[-20deg] select-none">
+                  Suspendu
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between mb-2">
               <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {p.title}
@@ -130,9 +143,10 @@ export default function Page() {
             </div>
 
             <div className="text-sm text-gray-800 dark:text-gray-200 mb-3">
-              {p.populationShort}
+              {"populationShort" in p ? (p as any).populationShort : ""}
             </div>
 
+            {/* mini-aperçu inclusion */}
             <div className="text-xs text-gray-900 dark:text-gray-100">
               <div className="font-semibold mb-1">Critères clés</div>
               <ul className="list-disc pl-5">
@@ -142,6 +156,16 @@ export default function Page() {
               </ul>
             </div>
 
+            {/* Infirmière responsable */}
+            <div className="mt-3 text-xs text-gray-700 dark:text-gray-300">
+              <div className="font-semibold">Infirmière responsable</div>
+              <div>
+                {(p as any).nurse?.name ? (p as any).nurse.name : "À déterminer"}
+              </div>
+              <div>{(p as any).nurse?.phone ? (p as any).nurse.phone : ""}</div>
+            </div>
+
+            {/* badges */}
             <div className="flex gap-2 flex-wrap mt-4">
               {p.phase && (
                 <span className="bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100 text-xs px-2 py-1 rounded">
@@ -153,7 +177,7 @@ export default function Page() {
                   {p.blinding}
                 </span>
               )}
-              {p.cardHighlights?.map((h) => (
+              {(p as any).cardHighlights?.map((h: string) => (
                 <span
                   key={h}
                   className="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 text-xs px-2 py-1 rounded"
@@ -166,7 +190,7 @@ export default function Page() {
         ))}
       </div>
 
-      {/* modal */}
+      {/* MODAL PROTOCOLE */}
       <Modal open={!!selected} onClose={() => setSelected(null)}>
         {selected && (
           <div className="space-y-6">
@@ -188,9 +212,44 @@ export default function Page() {
                     {selected.blinding}
                   </span>
                 )}
+                {(selected as any).suspended && (
+                  <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-100 text-xs px-2 py-1 rounded">
+                    Recrutement suspendu
+                  </span>
+                )}
               </div>
             </div>
 
+            {/* Coordination */}
+            <div className="space-y-1">
+              <div className="text-lg font-semibold">Coordination</div>
+              <div className="text-gray-900 dark:text-gray-100">
+                {(selected as any).nurse?.name
+                  ? (selected as any).nurse.name
+                  : "À déterminer"}
+              </div>
+              {(selected as any).nurse?.phone && (
+                <div className="text-gray-800 dark:text-gray-200">
+                  Téléphone : {(selected as any).nurse.phone}
+                </div>
+              )}
+            </div>
+
+            {/* Lien protocole complet */}
+            {(selected as any).protocolPdf && (
+              <div>
+                <a
+                  href={(selected as any).protocolPdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition"
+                >
+                  Télécharger le protocole complet (PDF)
+                </a>
+              </div>
+            )}
+
+            {/* Schémas */}
             {selected.schemaSrc?.length ? (
               <div className="space-y-3">
                 <div className="font-semibold">Schéma(s) de l’étude</div>
@@ -209,20 +268,23 @@ export default function Page() {
               </div>
             ) : null}
 
+            {/* Devis */}
             <div className="space-y-2">
               <div className="text-lg font-semibold">Devis (détails)</div>
               <p className="text-gray-900 dark:text-gray-100 whitespace-pre-line">
-                {selected.designFull}
+                {(selected as any).designFull ?? ""}
               </p>
             </div>
 
+            {/* Population */}
             <div className="space-y-2">
               <div className="text-lg font-semibold">Population (détails)</div>
               <p className="text-gray-900 dark:text-gray-100 whitespace-pre-line">
-                {selected.populationFull}
+                {(selected as any).populationFull ?? ""}
               </p>
             </div>
 
+            {/* Inclusion */}
             <div className="space-y-2">
               <div className="text-lg font-semibold">Critères d’inclusion</div>
               <ul className="list-disc pl-6 text-gray-900 dark:text-gray-100 space-y-1">
@@ -232,38 +294,44 @@ export default function Page() {
               </ul>
             </div>
 
-            {selected.exclusion?.length ? (
+            {/* Exclusion */}
+            {(selected as any).exclusion?.length ? (
               <div className="space-y-2">
                 <div className="text-lg font-semibold">Exclusions majeures</div>
                 <ul className="list-disc pl-6 text-gray-900 dark:text-gray-100 space-y-1">
-                  {selected.exclusion.map((e) => (
+                  {(selected as any).exclusion.map((e: string) => (
                     <li key={e}>{e}</li>
                   ))}
                 </ul>
               </div>
             ) : null}
 
-            {selected.endpoints?.primary?.length ||
-            selected.endpoints?.secondary?.length ? (
+            {/* Endpoints */}
+            {(selected as any).endpoints?.primary?.length ||
+            (selected as any).endpoints?.secondary?.length ? (
               <div className="space-y-4">
                 <div className="text-lg font-semibold">Endpoints</div>
-                {selected.endpoints?.primary?.length ? (
+
+                {(selected as any).endpoints?.primary?.length ? (
                   <div>
                     <div className="font-semibold">Primary</div>
                     <ul className="list-disc pl-6 space-y-1">
-                      {selected.endpoints.primary.map((x) => (
+                      {(selected as any).endpoints.primary.map((x: string) => (
                         <li key={x}>{x}</li>
                       ))}
                     </ul>
                   </div>
                 ) : null}
-                {selected.endpoints?.secondary?.length ? (
+
+                {(selected as any).endpoints?.secondary?.length ? (
                   <div>
                     <div className="font-semibold">Secondary</div>
                     <ul className="list-disc pl-6 space-y-1">
-                      {selected.endpoints.secondary.map((x) => (
-                        <li key={x}>{x}</li>
-                      ))}
+                      {(selected as any).endpoints.secondary.map(
+                        (x: string) => (
+                          <li key={x}>{x}</li>
+                        )
+                      )}
                     </ul>
                   </div>
                 ) : null}
@@ -273,6 +341,7 @@ export default function Page() {
         )}
       </Modal>
 
+      {/* MODAL ZOOM */}
       <Modal open={!!zoom} onClose={() => setZoom(null)}>
         {zoom && <img src={zoom} alt="Schéma (zoom)" className="rounded-xl" />}
       </Modal>

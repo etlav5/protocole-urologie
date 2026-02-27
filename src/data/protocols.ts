@@ -82,11 +82,6 @@ export const protocols: Protocol[] = [
   primaryEndpoint:
     "Survie globale (Overall Survival, OS).",
 
-  secondaryEndpoints: [
-    "Survie sans progression radiologique (rPFS)",
-    "Réponse PSA (PCWG3)",
-    "Temps jusqu’à progression clinique",
-    "Tolérance et sécurité"
   ],
 
   schemaSrc: ["/schemas/pr25_schema.png"],
@@ -132,11 +127,6 @@ export const protocols: Protocol[] = [
   primaryEndpoint:
     "Survie globale (Overall Survival, OS).",
 
-  secondaryEndpoints: [
-    "Progression PSA",
-    "Réponse PSA selon PCWG3",
-    "Cinétique PSA (déclin ≥90%, PSA <0.2, PSA <0.02)",
-    "Survie sans progression clinique"
   ],
 
   schemaSrc: ["/schemas/pr26_schema.png"],

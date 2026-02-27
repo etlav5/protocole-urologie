@@ -35,7 +35,7 @@ export type Protocol = {
   primaryEndpoint?: string; // outcome primaire / objectif primaire
 
   schemaSrc?: string[];   // ex: ["/schemas/volga_schema.png"]
-  protocolUrl?: string;   // ex: "/protocols/volga_protocol.pdf"
+  protocolURL?: string;   // ex: "/protocols/volga_protocol.pdf"
 
   nurse?: NurseContact;   // infirmière responsable (optionnel)
 };
@@ -170,7 +170,7 @@ export const protocols: Protocol[] = [
   protocolUrl: "/protocols/mk5684_004_protocol.pdf",
 
   nurse: { name: "Anne-Marie Maranda et Julie Michaud", phone: "#67705 et #67713" },
-  // suspended: false,
+  suspended: true,
 },
 
   {

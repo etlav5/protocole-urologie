@@ -323,13 +323,13 @@ export const protocols: Protocol[] = [
       "Consentement signé"
     ],
 
-    endpoints: {
-      primary: [
+    
+      primaryendpoint: [
         "Dose-limiting toxicities (DLT)",
         "Incidence des événements indésirables (AEs)",
         "Arrêt du traitement lié aux AEs"
-      ]
-    },
+      ],
+    
 
     cardHighlights: [
       "HR NMIBC",

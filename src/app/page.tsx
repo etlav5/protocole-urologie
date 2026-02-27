@@ -236,10 +236,10 @@ export default function Page() {
             </div>
 
             {/* Lien protocole complet */}
-            {(selected as any).protocolPdf && (
+            {(selected as any).protocolUrl && (
               <div>
                 <a
-                  href={(selected as any).protocolPdf}
+                  href={(selected as any).protocolUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition"

@@ -82,7 +82,7 @@ export const protocols: Protocol[] = [
   primaryEndpoint:
     "Survie globale (Overall Survival, OS).",
 
-  ],
+
 
   schemaSrc: ["/schemas/pr25_schema.png"],
 
@@ -127,7 +127,7 @@ export const protocols: Protocol[] = [
   primaryEndpoint:
     "Survie globale (Overall Survival, OS).",
 
-  ],
+  
 
   schemaSrc: ["/schemas/pr26_schema.png"],
 

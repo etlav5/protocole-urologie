@@ -1,37 +1,32 @@
 "use client";
-import React, { useMemo, useState } from "react";
-import {
-  protocols,
-  timelineByCancer,
-  type Cancer,
-  type Protocol,
-} from "../data/protocols";
 
-function Modal({
-  open,
-  onClose,
-  children,
-}: {
+import React, { useMemo, useState } from "react";
+import type { Cancer, Protocol } from "@/data/protocols";
+import { protocols, timelineByCancer } from "@/data/protocols";
+
+type ModalProps = {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-}) {
+};
+
+function Modal({ open, onClose, children }: ModalProps) {
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-3xl p-6 relative border border-gray-200 dark:border-gray-700">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-3 text-gray-700 dark:text-gray-200"
+          className="absolute right-4 top-3 rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100"
           aria-label="Fermer"
         >
           ✕
         </button>
-        <div className="max-h-[75vh] overflow-y-auto pr-2 text-gray-900 dark:text-gray-100">
-          {children}
-        </div>
+
+        {/* IMPORTANT: scroll dans la modal */}
+        <div className="max-h-[75vh] overflow-y-auto pr-2">{children}</div>
       </div>
     </div>
   );
@@ -39,36 +34,35 @@ function Modal({
 
 export default function Page() {
   const [activeCancer, setActiveCancer] = useState<Cancer>("Prostate");
-  const [activeStage, setActiveStage] = useState(
-    timelineByCancer["Prostate"][0]
+  const [activeStage, setActiveStage] = useState<string>(
+    timelineByCancer["Prostate"][0] ?? "Localisé"
   );
+
   const [selected, setSelected] = useState<Protocol | null>(null);
   const [zoom, setZoom] = useState<string | null>(null);
 
   const stages = timelineByCancer[activeCancer];
 
   const filtered = useMemo(() => {
-    return protocols
-      .filter((p) => p.cancer === activeCancer && p.stage === activeStage)
-      .sort((a, b) => a.title.localeCompare(b.title));
+    return protocols.filter(
+      (p) => p.cancer === activeCancer && p.stage === activeStage
+    );
   }, [activeCancer, activeStage]);
 
-  const cardInclusionPreview = (p: Protocol) => p.inclusion.slice(0, 2);
-
   return (
-    <div className="p-8 min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 p-8 text-gray-900">
       {/* TITRE */}
       <div className="mb-10">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-gray-900">
           Protocoles de recherche en urologie
         </h1>
-        <p className="mt-2 text-gray-800 dark:text-gray-200">
+        <p className="mt-2 text-gray-700">
           Outil interne de visualisation des études cliniques
         </p>
       </div>
 
-      {/* ONGLETS */}
-      <div className="flex gap-3 mb-6">
+      {/* ONGLET CANCER */}
+      <div className="mb-6 flex gap-3">
         {(["Prostate", "Vessie", "Rein"] as Cancer[]).map((c) => (
           <button
             key={c}
@@ -76,10 +70,10 @@ export default function Page() {
               setActiveCancer(c);
               setActiveStage(timelineByCancer[c][0]);
             }}
-            className={`px-4 py-2 rounded-xl border ${
+            className={`rounded-xl px-4 py-2 ${
               c === activeCancer
-                ? "bg-black text-white border-black"
-                : "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
+                ? "bg-black text-white"
+                : "bg-white text-gray-900 shadow hover:bg-gray-50"
             }`}
           >
             {c}
@@ -89,263 +83,209 @@ export default function Page() {
 
       {/* TIMELINE */}
       <div className="mb-10">
-        <div className="relative flex justify-between items-center">
-          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300 dark:bg-gray-700" />
+        <div className="relative flex items-center justify-between">
+          <div className="absolute left-0 right-0 top-4 h-1 bg-gray-300" />
           {stages.map((s) => (
-            <div key={s} className="flex flex-col items-center z-10">
+            <div key={s} className="z-10 flex flex-col items-center">
               <button
                 onClick={() => setActiveStage(s)}
-                className={`w-6 h-6 rounded-full border-4 ${
+                className={`h-6 w-6 rounded-full border-4 ${
                   s === activeStage
-                    ? "bg-black border-black"
-                    : "bg-white dark:bg-gray-950 border-gray-500 dark:border-gray-400"
+                    ? "border-black bg-black"
+                    : "border-gray-500 bg-white"
                 }`}
-                aria-label={`Choisir stade ${s}`}
+                aria-label={`Stage ${s}`}
               />
-              <div className="text-xs mt-2 text-gray-900 dark:text-gray-100">
-                {s}
-              </div>
+              <div className="mt-2 text-xs text-gray-800">{s}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* CARTES */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
         {filtered.map((p) => (
           <button
             key={p.id}
             onClick={() => setSelected(p)}
-            className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border border-gray-200 dark:border-gray-700"
+            className="relative rounded-2xl border bg-white p-6 text-left shadow-md transition hover:shadow-xl"
           >
-            {/* WATERMARK SUSPENDU */}
-            {(p as any).suspended && (
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div className="text-4xl md:text-5xl font-extrabold uppercase tracking-widest text-red-700/35 dark:text-red-300/25 rotate-[-20deg] select-none">
-                  Suspendu
+            {/* Watermark SUSPENDU */}
+            {p.suspended && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl">
+                <div className="rotate-[-20deg] text-4xl font-extrabold tracking-widest text-red-600/25">
+                  SUSPENDU
                 </div>
               </div>
             )}
 
-            <div className="flex justify-between mb-2">
-              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <div className="mb-2 flex items-start justify-between gap-3">
+              <div className="text-lg font-semibold text-gray-900">
                 {p.title}
               </div>
+
               {p.randomized && (
-                <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-100 text-xs px-2 py-1 rounded">
+                <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
                   Randomisée
                 </span>
               )}
             </div>
 
-            <div className="text-sm text-gray-900 dark:text-gray-100 mb-2">
-              {p.designShort}
-            </div>
+            <div className="mb-2 text-sm text-gray-800">{p.designShort}</div>
 
-            <div className="text-sm text-gray-800 dark:text-gray-200 mb-3">
-              {"populationShort" in p ? (p as any).populationShort : ""}
-            </div>
-
-            {/* mini-aperçu inclusion */}
-            <div className="text-xs text-gray-900 dark:text-gray-100">
-              <div className="font-semibold mb-1">Critères clés</div>
-              <ul className="list-disc pl-5">
-                {cardInclusionPreview(p).map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Infirmière responsable */}
-            <div className="mt-3 text-xs text-gray-700 dark:text-gray-300">
-              <div className="font-semibold">Infirmière responsable</div>
-              <div>
-                {(p as any).nurse?.name ? (p as any).nurse.name : "À déterminer"}
-              </div>
-              <div>{(p as any).nurse?.phone ? (p as any).nurse.phone : ""}</div>
-            </div>
-
-            {/* badges */}
-            <div className="flex gap-2 flex-wrap mt-4">
+            <div className="flex flex-wrap gap-2">
               {p.phase && (
-                <span className="bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100 text-xs px-2 py-1 rounded">
+                <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
                   {p.phase}
                 </span>
               )}
               {p.blinding && (
-                <span className="bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-100 text-xs px-2 py-1 rounded">
+                <span className="rounded bg-purple-100 px-2 py-1 text-xs text-purple-800">
                   {p.blinding}
                 </span>
               )}
-              {(p as any).cardHighlights?.map((h: string) => (
-                <span
-                  key={h}
-                  className="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 text-xs px-2 py-1 rounded"
-                >
-                  {h}
-                </span>
-              ))}
             </div>
+
+            {/* Petit aperçu de population */}
+            {p.population && (
+              <div className="mt-3 text-xs text-gray-700 line-clamp-2">
+                <span className="font-semibold">Population:</span> {p.population}
+              </div>
+            )}
           </button>
         ))}
       </div>
 
-      {/* MODAL PROTOCOLE */}
-      <Modal open={!!selected} onClose={() => setSelected(null)}>
+      {/* MODAL DÉTAIL */}
+      <Modal open={selected !== null} onClose={() => setSelected(null)}>
         {selected && (
           <div className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold">{selected.title}</h2>
-              <div className="flex gap-2 flex-wrap">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                {selected.title}
+              </h2>
+
+              <div className="mt-2 flex flex-wrap gap-2">
                 {selected.phase && (
-                  <span className="bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100 text-xs px-2 py-1 rounded">
+                  <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
                     {selected.phase}
                   </span>
                 )}
                 {selected.randomized && (
-                  <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-100 text-xs px-2 py-1 rounded">
+                  <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
                     Randomisée
                   </span>
                 )}
                 {selected.blinding && (
-                  <span className="bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-100 text-xs px-2 py-1 rounded">
+                  <span className="rounded bg-purple-100 px-2 py-1 text-xs text-purple-800">
                     {selected.blinding}
                   </span>
                 )}
-                {(selected as any).suspended && (
-                  <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-100 text-xs px-2 py-1 rounded">
+                {selected.suspended && (
+                  <span className="rounded bg-orange-100 px-2 py-1 text-xs text-orange-800">
                     Recrutement suspendu
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Coordination */}
-            <div className="space-y-1">
-              <div className="text-lg font-semibold">Coordination</div>
-              <div className="text-gray-900 dark:text-gray-100">
-                {(selected as any).nurse?.name
-                  ? (selected as any).nurse.name
-                  : "À déterminer"}
-              </div>
-              {(selected as any).nurse?.phone && (
-                <div className="text-gray-800 dark:text-gray-200">
-                  Téléphone : {(selected as any).nurse.phone}
-                </div>
-              )}
-            </div>
-
-            {/* Lien protocole complet */}
-            {(selected as any).protocolUrl && (
+            {/* Lien protocole PDF */}
+            {selected.protocolUrl && (
               <div>
                 <a
-                  href={(selected as any).protocolUrl}
+                  href={selected.protocolUrl}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-900"
                 >
-                  Télécharger le protocole complet (PDF)
+                  Ouvrir le protocole (PDF)
                 </a>
+                <div className="mt-1 text-xs text-gray-700">
+                  (S’ouvre dans un nouvel onglet)
+                </div>
+              </div>
+            )}
+
+            {/* Contact infirmière */}
+            {(selected.nurse?.name || selected.nurse?.phone) && (
+              <div className="rounded-xl border bg-gray-50 p-4">
+                <div className="text-sm font-semibold text-gray-900">
+                  Infirmière responsable
+                </div>
+                <div className="mt-1 text-sm text-gray-800">
+                  {selected.nurse?.name ?? ""}
+                  {selected.nurse?.name && selected.nurse?.phone ? " — " : ""}
+                  {selected.nurse?.phone ?? ""}
+                </div>
               </div>
             )}
 
             {/* Schémas */}
-            {selected.schemaSrc?.length ? (
+            {selected.schemaSrc && selected.schemaSrc.length > 0 && (
               <div className="space-y-3">
-                <div className="font-semibold">Schéma(s) de l’étude</div>
+                <div className="text-sm font-semibold text-gray-900">
+                  Schéma(s) de l’étude
+                </div>
                 {selected.schemaSrc.map((src) => (
                   <img
                     key={src}
                     src={src}
-                    alt={`Schéma - ${selected.title}`}
-                    className="rounded-xl border border-gray-200 dark:border-gray-700 cursor-zoom-in"
+                    alt="Schéma de l’étude"
+                    className="cursor-zoom-in rounded-xl border"
                     onClick={() => setZoom(src)}
                   />
                 ))}
-                <div className="text-xs text-gray-800 dark:text-gray-200">
-                  Astuce : clique sur une image pour zoomer.
+                <div className="text-xs text-gray-700">
+                  Clique sur une image pour agrandir.
                 </div>
               </div>
-            ) : null}
+            )}
 
-            {/* Devis */}
-            <div className="space-y-2">
-              <div className="text-lg font-semibold">Devis (détails)</div>
-              <p className="text-gray-900 dark:text-gray-100 whitespace-pre-line">
-                {(selected as any).designFull ?? ""}
-              </p>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">Devis</div>
+              <p className="mt-1 text-sm text-gray-800">{selected.designFull}</p>
             </div>
 
-            {/* Population */}
-            <div className="space-y-2">
-              <div className="text-lg font-semibold">Population (détails)</div>
-              <p className="text-gray-900 dark:text-gray-100 whitespace-pre-line">
-                {(selected as any).populationFull ?? ""}
-              </p>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">Population</div>
+              <p className="mt-1 text-sm text-gray-800">{selected.population}</p>
             </div>
 
-            {/* Inclusion */}
-            <div className="space-y-2">
-              <div className="text-lg font-semibold">Critères d’inclusion</div>
-              <ul className="list-disc pl-6 text-gray-900 dark:text-gray-100 space-y-1">
+            {selected.primaryEndpoint && (
+              <div>
+                <div className="text-sm font-semibold text-gray-900">
+                  Outcome primaire
+                </div>
+                <p className="mt-1 text-sm text-gray-800">
+                  {selected.primaryEndpoint}
+                </p>
+              </div>
+            )}
+
+            <div>
+              <div className="text-sm font-semibold text-gray-900">
+                Critères d’inclusion (principaux)
+              </div>
+              <ul className="mt-1 list-disc pl-6 text-sm text-gray-800">
                 {selected.inclusion.map((i) => (
                   <li key={i}>{i}</li>
                 ))}
               </ul>
             </div>
-
-            {/* Exclusion */}
-            {(selected as any).exclusion?.length ? (
-              <div className="space-y-2">
-                <div className="text-lg font-semibold">Exclusions majeures</div>
-                <ul className="list-disc pl-6 text-gray-900 dark:text-gray-100 space-y-1">
-                  {(selected as any).exclusion.map((e: string) => (
-                    <li key={e}>{e}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {/* Endpoints */}
-            {(selected as any).endpoints?.primary?.length ||
-            (selected as any).endpoints?.secondary?.length ? (
-              <div className="space-y-4">
-                <div className="text-lg font-semibold">Endpoints</div>
-
-                {(selected as any).endpoints?.primary?.length ? (
-                  <div>
-                    <div className="font-semibold">Primary</div>
-                    <ul className="list-disc pl-6 space-y-1">
-                      {(selected as any).endpoints.primary.map((x: string) => (
-                        <li key={x}>{x}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                {(selected as any).endpoints?.secondary?.length ? (
-                  <div>
-                    <div className="font-semibold">Secondary</div>
-                    <ul className="list-disc pl-6 space-y-1">
-                      {(selected as any).endpoints.secondary.map(
-                        (x: string) => (
-                          <li key={x}>{x}</li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
           </div>
         )}
       </Modal>
 
       {/* MODAL ZOOM */}
-      <Modal open={!!zoom} onClose={() => setZoom(null)}>
-        {zoom && <img src={zoom} alt="Schéma (zoom)" className="rounded-xl" />}
+      <Modal open={zoom !== null} onClose={() => setZoom(null)}>
+        {zoom && (
+          <img
+            src={zoom}
+            alt="Schéma agrandi"
+            className="rounded-xl border"
+          />
+        )}
       </Modal>
     </div>
   );
 }
-

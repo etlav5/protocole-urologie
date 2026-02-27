@@ -310,10 +310,9 @@ export const protocols: Protocol[] = [
     designFull:
       "Étude interventionnelle de phase 1/2, multi-sites, à un seul bras, en ouvert, évaluant MK-3120 administré par voie intravésicale en induction hebdomadaire suivie d’une phase de maintenance mensuelle.",
 
-    populationShort:
-      "HR NMIBC avec CIS ± papillaire, BCG-naïf ou BCG-exposé",
+   
 
-    populationFull:
+    population:
       "Participants avec NMIBC à haut risque avec CIS (avec ou sans tumeur papillaire), BCG-naïfs ou BCG-exposés selon critères définis, traités par MK-3120 intravésical.",
 
     inclusion: [

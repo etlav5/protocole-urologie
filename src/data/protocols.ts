@@ -326,11 +326,6 @@ export const protocols: Protocol[] = [
     
     
 
-    cardHighlights: [
-      "HR NMIBC",
-      "Phase 1/2",
-      "Intravésical"
-    ],
 
     schemaSrc: ["/schemas/mk3120_schema.png"],
     protocolUrl: "/protocols/mk3120_protocol.pdf",

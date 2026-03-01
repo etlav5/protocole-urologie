@@ -35,7 +35,7 @@ export type Protocol = {
   primaryEndpoint?: string; // outcome primaire / objectif primaire
 
   schemaSrc?: string[];   // ex: ["/schemas/volga_schema.png"]
-  protocolURL?: string;   // ex: "/protocols/volga_protocol.pdf"
+  protocolUrl?: string;   // ex: "/protocols/volga_protocol.pdf"
 
   nurse?: NurseContact;   // infirmière responsable (optionnel)
 };

@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import type { Cancer, Protocol } from "@/data/protocols";
-import { protocols, timelineByCancer } from "@/data/protocols";
+import Image from "next/image";
+
+import {
+  protocols,
+  timelineByCancer,
+  type Cancer,
+  type Protocol,
+} from "@/data/protocols";
 
 type ModalProps = {
   open: boolean;
@@ -16,16 +22,12 @@ function Modal({ open, onClose, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-3 rounded-lg px-2 py-1 text-gray-700 hover:bg-gray-100"
-          aria-label="Fermer"
-        >
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 relative">
+        <button onClick={onClose} className="absolute right-4 top-3">
           ✕
         </button>
 
-        {/* IMPORTANT: scroll dans la modal */}
+        {/* IMPORTANT: scroll interne */}
         <div className="max-h-[75vh] overflow-y-auto pr-2">{children}</div>
       </div>
     </div>
@@ -35,7 +37,7 @@ function Modal({ open, onClose, children }: ModalProps) {
 export default function Page() {
   const [activeCancer, setActiveCancer] = useState<Cancer>("Prostate");
   const [activeStage, setActiveStage] = useState<string>(
-    timelineByCancer["Prostate"][0] ?? "Localisé"
+    timelineByCancer["Prostate"][0]
   );
 
   const [selected, setSelected] = useState<Protocol | null>(null);
@@ -50,19 +52,19 @@ export default function Page() {
   }, [activeCancer, activeStage]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 text-gray-900">
+    <div className="p-8 bg-gray-50 min-h-screen">
       {/* TITRE */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">
           Protocoles de recherche en urologie
         </h1>
-        <p className="mt-2 text-gray-700">
+        <p className="text-gray-700 mt-2">
           Outil interne de visualisation des études cliniques
         </p>
       </div>
 
       {/* ONGLET CANCER */}
-      <div className="mb-6 flex gap-3">
+      <div className="flex gap-3 mb-6">
         {(["Prostate", "Vessie", "Rein"] as Cancer[]).map((c) => (
           <button
             key={c}
@@ -70,10 +72,8 @@ export default function Page() {
               setActiveCancer(c);
               setActiveStage(timelineByCancer[c][0]);
             }}
-            className={`rounded-xl px-4 py-2 ${
-              c === activeCancer
-                ? "bg-black text-white"
-                : "bg-white text-gray-900 shadow hover:bg-gray-50"
+            className={`px-4 py-2 rounded-xl ${
+              c === activeCancer ? "bg-black text-white" : "bg-white shadow"
             }`}
           >
             {c}
@@ -83,190 +83,161 @@ export default function Page() {
 
       {/* TIMELINE */}
       <div className="mb-10">
-        <div className="relative flex items-center justify-between">
-          <div className="absolute left-0 right-0 top-4 h-1 bg-gray-300" />
+        <div className="relative flex justify-between items-center">
+          <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300" />
           {stages.map((s) => (
-            <div key={s} className="z-10 flex flex-col items-center">
+            <div key={s} className="flex flex-col items-center z-10">
               <button
                 onClick={() => setActiveStage(s)}
-                className={`h-6 w-6 rounded-full border-4 ${
+                className={`w-6 h-6 rounded-full border-4 ${
                   s === activeStage
-                    ? "border-black bg-black"
-                    : "border-gray-500 bg-white"
+                    ? "bg-black border-black"
+                    : "bg-white border-gray-400"
                 }`}
-                aria-label={`Stage ${s}`}
               />
-              <div className="mt-2 text-xs text-gray-800">{s}</div>
+              <div className="text-xs mt-2 text-gray-900">{s}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* CARTES */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid md:grid-cols-2 gap-6">
         {filtered.map((p) => (
           <button
             key={p.id}
             onClick={() => setSelected(p)}
-            className="relative rounded-2xl border bg-white p-6 text-left shadow-md transition hover:shadow-xl"
+            className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition text-left border relative overflow-hidden"
           >
             {/* Watermark SUSPENDU */}
             {p.suspended && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl">
-                <div className="rotate-[-20deg] text-4xl font-extrabold tracking-widest text-red-600/25">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div className="text-4xl md:text-5xl font-black text-gray-300/70 rotate-[-20deg] select-none">
                   SUSPENDU
                 </div>
               </div>
             )}
 
-            <div className="mb-2 flex items-start justify-between gap-3">
+            <div className="flex justify-between mb-2 relative">
               <div className="text-lg font-semibold text-gray-900">
                 {p.title}
               </div>
-
               {p.randomized && (
-                <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
+                <span className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">
                   Randomisée
                 </span>
               )}
             </div>
 
-            <div className="mb-2 text-sm text-gray-800">{p.designShort}</div>
+            <div className="text-sm text-gray-800 mb-2 relative">
+              {p.designShort}
+            </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 flex-wrap relative">
               {p.phase && (
-                <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                   {p.phase}
                 </span>
               )}
+
               {p.blinding && (
-                <span className="rounded bg-purple-100 px-2 py-1 text-xs text-purple-800">
+                <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
                   {p.blinding}
                 </span>
               )}
-            </div>
 
-            {/* Petit aperçu de population */}
-            {p.population && (
-              <div className="mt-3 text-xs text-gray-700 line-clamp-2">
-                <span className="font-semibold">Population:</span> {p.population}
-              </div>
-            )}
+              {p.primaryEndpoint && (
+                <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded">
+                  Endpoint primaire
+                </span>
+              )}
+            </div>
           </button>
         ))}
       </div>
 
-      {/* MODAL DÉTAIL */}
+      {/* MODAL DETAILS */}
       <Modal open={selected !== null} onClose={() => setSelected(null)}>
         {selected && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                {selected.title}
-              </h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {selected.title}
+            </h2>
 
-              <div className="mt-2 flex flex-wrap gap-2">
-                {selected.phase && (
-                  <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
-                    {selected.phase}
-                  </span>
-                )}
-                {selected.randomized && (
-                  <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
-                    Randomisée
-                  </span>
-                )}
-                {selected.blinding && (
-                  <span className="rounded bg-purple-100 px-2 py-1 text-xs text-purple-800">
-                    {selected.blinding}
-                  </span>
-                )}
-                {selected.suspended && (
-                  <span className="rounded bg-orange-100 px-2 py-1 text-xs text-orange-800">
-                    Recrutement suspendu
-                  </span>
-                )}
-              </div>
-            </div>
+            {/* Schémas (zoom au clic) */}
+            {selected.schemaSrc?.map((src) => (
+              <button
+                key={src}
+                type="button"
+                className="block w-full"
+                onClick={() => setZoom(src)}
+                title="Cliquer pour agrandir"
+              >
+                <div className="rounded-xl border overflow-hidden">
+                  <Image
+                    src={src}
+                    alt={`Schéma ${selected.title}`}
+                    width={1600}
+                    height={900}
+                    className="w-full h-auto cursor-zoom-in"
+                  />
+                </div>
+              </button>
+            ))}
 
-            {/* Lien protocole PDF */}
+            {/* Lien protocole complet */}
             {selected.protocolUrl && (
-              <div>
+              <div className="bg-gray-100 rounded-xl p-4">
+                <div className="font-semibold text-gray-900 mb-2">
+                  Protocole complet
+                </div>
                 <a
                   href={selected.protocolUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-900"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-black text-white"
                 >
-                  Ouvrir le protocole (PDF)
+                  Ouvrir le PDF
                 </a>
-                <div className="mt-1 text-xs text-gray-700">
+                <div className="text-xs text-gray-700 mt-2">
                   (S’ouvre dans un nouvel onglet)
                 </div>
               </div>
             )}
 
             {/* Contact infirmière */}
-            {(selected.nurse?.name || selected.nurse?.phone) && (
-              <div className="rounded-xl border bg-gray-50 p-4">
-                <div className="text-sm font-semibold text-gray-900">
-                  Infirmière responsable
-                </div>
-                <div className="mt-1 text-sm text-gray-800">
-                  {selected.nurse?.name ?? ""}
-                  {selected.nurse?.name && selected.nurse?.phone ? " — " : ""}
-                  {selected.nurse?.phone ?? ""}
-                </div>
+            <div className="bg-gray-100 rounded-xl p-4">
+              <div className="font-semibold text-gray-900 mb-1">
+                Infirmière responsable
               </div>
-            )}
-
-            {/* Schémas */}
-            {selected.schemaSrc && selected.schemaSrc.length > 0 && (
-              <div className="space-y-3">
-                <div className="text-sm font-semibold text-gray-900">
-                  Schéma(s) de l’étude
-                </div>
-                {selected.schemaSrc.map((src) => (
-                  <img
-                    key={src}
-                    src={src}
-                    alt="Schéma de l’étude"
-                    className="cursor-zoom-in rounded-xl border"
-                    onClick={() => setZoom(src)}
-                  />
-                ))}
-                <div className="text-xs text-gray-700">
-                  Clique sur une image pour agrandir.
-                </div>
+              <div className="text-gray-900">
+                {selected.nurse?.name ? selected.nurse.name : "—"}
               </div>
-            )}
-
-            <div>
-              <div className="text-sm font-semibold text-gray-900">Devis</div>
-              <p className="mt-1 text-sm text-gray-800">{selected.designFull}</p>
+              <div className="text-gray-900">
+                {selected.nurse?.phone ? selected.nurse.phone : "—"}
+              </div>
             </div>
 
             <div>
-              <div className="text-sm font-semibold text-gray-900">Population</div>
-              <p className="mt-1 text-sm text-gray-800">{selected.population}</p>
+              <b className="text-gray-900">Devis</b>
+              <p className="text-gray-900">{selected.designFull}</p>
+            </div>
+
+            <div>
+              <b className="text-gray-900">Population</b>
+              <p className="text-gray-900">{selected.population}</p>
             </div>
 
             {selected.primaryEndpoint && (
               <div>
-                <div className="text-sm font-semibold text-gray-900">
-                  Outcome primaire
-                </div>
-                <p className="mt-1 text-sm text-gray-800">
-                  {selected.primaryEndpoint}
-                </p>
+                <b className="text-gray-900">Endpoint primaire</b>
+                <p className="text-gray-900">{selected.primaryEndpoint}</p>
               </div>
             )}
 
             <div>
-              <div className="text-sm font-semibold text-gray-900">
-                Critères d’inclusion (principaux)
-              </div>
-              <ul className="mt-1 list-disc pl-6 text-sm text-gray-800">
+              <b className="text-gray-900">Critères d’inclusion</b>
+              <ul className="list-disc pl-6 text-gray-900">
                 {selected.inclusion.map((i) => (
                   <li key={i}>{i}</li>
                 ))}
@@ -276,14 +247,18 @@ export default function Page() {
         )}
       </Modal>
 
-      {/* MODAL ZOOM */}
+      {/* MODAL ZOOM IMAGE */}
       <Modal open={zoom !== null} onClose={() => setZoom(null)}>
         {zoom && (
-          <img
-            src={zoom}
-            alt="Schéma agrandi"
-            className="rounded-xl border"
-          />
+          <div className="rounded-xl border overflow-hidden">
+            <Image
+              src={zoom}
+              alt="Schéma (zoom)"
+              width={2000}
+              height={1200}
+              className="w-full h-auto"
+            />
+          </div>
         )}
       </Modal>
     </div>
